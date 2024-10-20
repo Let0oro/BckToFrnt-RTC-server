@@ -15,7 +15,7 @@ const getEvents = async (req, res, next) => {
   } catch (err) {
     return res
       .status(400)
-      .json({ message: "Error getting all events: "+ err.message });
+      .json({ message: "Error getting all events: " + err.message });
   }
 };
 
@@ -130,11 +130,10 @@ const updateEventById = async (req, res, next) => {
 
     if (!userMod || !eventMod) {
       return res.status(404).json({
-        message: `${
-          !userMod
-            ? "User doesn't exist"
-            : `Events with ID:${eventId} don't exist`
-        }`,
+        message: `${!userMod
+          ? "User doesn't exist"
+          : `Events with ID:${eventId} don't exist`
+          }`,
       });
     }
 
@@ -152,6 +151,8 @@ const updateEventById = async (req, res, next) => {
     if (!existBothId && !action == "unsave") {
       return res.status(400).json({ message: "User isn't an attendee" });
     }
+
+    console.log({ action })
 
     if (existsID(confirmed, userId) && action == "confirm") {
       return res.status(400).json({ message: "User already is confirmed" });
@@ -183,7 +184,7 @@ const updateEventById = async (req, res, next) => {
 
 
 
-  
+
     objByAction = {
       save: { $addToSet: { eventsSaved: eventId } },
       unsave: {
@@ -203,9 +204,8 @@ const updateEventById = async (req, res, next) => {
 
 
     return res.status(200).json({
-      message: `Event and User updated and ${action}${
-        action.at(-1) == "e" ? "" : "e"
-      }d`,
+      message: `Event and User updated and ${action}${action.at(-1) == "e" ? "" : "e"
+        }d`,
       eventAttendees: newEvent.attendees,
       eventConfirmed: newEvent.confirmed,
       userSaved: newUser.eventsSaved,
@@ -228,15 +228,15 @@ const deleteEvent = async (req, res, next) => {
     const { attendees, confirmed } = event;
 
     const removeUsersEvents = async (userID) => {
-  
-  
+
+
       const user = await User.findById(userID);
       if (!user)
         return res.status(404).json("Unauthorized deleting users event");
       const { events: oldEvents, eventsSaved: oldSaved } = user;
       const newEvent = oldEvents.filter((ev) => String(ev._id) != userID);
       const newSaved = oldSaved.filter((ev) => String(ev._id) != userID);
-  
+
       await User.findByIdAndUpdate(userID, {
         ...user,
         events: newEvent,

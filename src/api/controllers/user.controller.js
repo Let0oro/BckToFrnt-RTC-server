@@ -149,15 +149,15 @@ const register = async (req, res) => {
     });
     await newUser.save();
 
-    
+
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
       newUser._id
     );
-    
+
     const createdUser = await User.findById(newUser._id).select(
       "-password -refreshToken"
     );
-    
+
 
     if (!createdUser)
       return res.status(500).json({ message: "Something went wrong" });
